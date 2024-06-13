@@ -135,7 +135,7 @@ int main() {
 Graph* initGraph() {
     Graph* graph = (Graph*)malloc(sizeof(Graph));
     if (graph == NULL) { // 메모리 할당 실패 시 NULL 반환
-        printf(stderr, "메모리 할당 실패\n");
+        printf("메모리 할당 실패\n");
         return NULL; 
     }
     for (int i = 0; i < MAX_VERTICAL_NUM; i++) {
