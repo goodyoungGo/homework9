@@ -42,6 +42,8 @@ int main() {
     printf("[----- [Goh Geon Young]  [2020017027] -----]\n");
 
     Graph* graph = initGraph(); // 맨 처음에 graph 초기화
+
+    // 필요 변수 선언
     char command;
     int vertex, start, end;
 
@@ -145,7 +147,7 @@ void insertVertex(Graph* graph, int vertex) {
 
 // edge 삽입
 void insertEdge(Graph* graph, int start, int end) {
-    if (graph->exists[start] && graph->exists[end]) { // start의 정점 존재하면
+    if (graph->exists[start] && graph->exists[end]) { // start, end의 정점 존재하면
         Node* newNode = createNode(end); // 새 노드 생성
         if (graph->adjList[start] == NULL) // 인접리스트가 비어있으면
             graph->adjList[start] = newNode; // 할당
@@ -156,7 +158,7 @@ void insertEdge(Graph* graph, int start, int end) {
                 temp = temp->next;
             temp->next = newNode; // 마지막의 뒤에 newNode를 붙인다.
         }
-    } else {
+    } else { // start, end의 정점이 존재하지 않으면
         printf("정점 삽입 오류\n");
     }
 }
@@ -164,7 +166,7 @@ void insertEdge(Graph* graph, int start, int end) {
 
 // DFS 
 void depthFirstSearch(Graph* graph, int vertex) {
-    if (!graph->exists[vertex]) {
+    if (!graph->exists[vertex]) { // 해당 정점이 없을 경우
         printf("정점이 존재하지 않습니다.\n");
         return;
     }
@@ -186,8 +188,8 @@ void depthFirstSearch(Graph* graph, int vertex) {
 
 // BFS
 void breadthFirstSearch(Graph* graph, int startVertex) {
-    if (!graph->exists[startVertex]) {
-        printf("정점이 존재하지 않습니다.\n");
+    if (!graph->exists[startVertex]) { // 시작 정점이 없을 경우
+        printf("정점이 존재하지 않습니다.\n"); 
         return;
     }
     enqueue(startVertex); // 큐 자료구조를 활용하여 bfs 방식 구현
