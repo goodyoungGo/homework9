@@ -66,7 +66,7 @@ int main() {
                 graph = initGraph(); // graph 초기화
                 
                 if (graph == NULL) {
-                    printf(stderr, "그래프 초기화 실패\n");
+                    printf("그래프 초기화 실패\n");
                     return -1; // 그래프 초기화 실패 시 -1 반환하여 프로그램 종료
                 }
 
@@ -278,7 +278,7 @@ Node* createNode(int vertex) {
     
     if (newNode == NULL) {
         printf("메모리 할당 실패\n");
-        return; // 메모리 할당 실패 시 NULL 반환
+        return NULL; // 메모리 할당 실패 시 NULL 반환
     }
     newNode->vertex = vertex; // vertex 삽입
     newNode->next = NULL; // 다음 node NULL
