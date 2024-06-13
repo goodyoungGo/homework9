@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define MAX_VERTICES 10
+#define MAX_VERTICAL_NUM 10
 
-// 인접 리스트의 노드 구조체
+// 인접 리스트의 구조체
 typedef struct Node {
     int vertex;
     struct Node* next;
@@ -12,29 +12,16 @@ typedef struct Node {
 
 // 그래프 구조체
 typedef struct Graph {
-    Node* adjList[MAX_VERTICES];
-    bool visited[MAX_VERTICES];
-    bool exists[MAX_VERTICES]; // 각 정점의 존재 여부를 나타내는 배열
+    Node* adjList[MAX_VERTICAL_NUM]; // 인접 리스트
+    bool visited[MAX_VERTICAL_NUM]; // 방문 기록
+    bool exists[MAX_VERTICAL_NUM]; // 각 정점의 존재 여부를 나타내는 배열
 } Graph;
 
-// 함수 선언
-Graph* initializeGraph();
-void insertVertex(Graph* graph, int vertex);
-void insertEdge(Graph* graph, int start, int end);
-void depthFirstSearch(Graph* graph, int vertex);
-void breadthFirstSearch(Graph* graph, int startVertex);
-void printGraph(Graph* graph);
-void freeGraph(Graph* graph);
-void clearVisited(Graph* graph);
-Node* createNode(int vertex);
-void enqueue(int vertex);
-int dequeue();
-bool isEmpty();
 
 // 큐 구현을 위한 전역 변수
-int queue[MAX_VERTICES];
-int front = -1;
-int rear = -1;
+int queue[MAX_VERTICAL_NUM];
+// 큐 front, rear 초기화
+int front = -1, rear = -1;
 
 // main 함수
 int main() {
@@ -60,53 +47,53 @@ int main() {
             case 'z':
                 freeGraph(graph);
                 graph = initializeGraph();
-                printf("Graph initialized.\n");
+                printf("init graph.\n");
                 break;
             case 'v':
                 printf("Enter vertex (0-9): ");
                 scanf("%d", &vertex);
-                if (vertex >= 0 && vertex < MAX_VERTICES) {
+                if (vertex >= 0 && vertex < MAX_VERTICAL_NUM) {
                     insertVertex(graph, vertex);
-                    printf("Vertex %d inserted.\n", vertex);
-                } else {
-                    printf("Invalid vertex number.\n");
-                }
+                    printf("정점 %d 삽입.\n", vertex);
+                } else
+                    printf("Invalid vertex.\n");
+                
                 break;
             case 'e':
                 printf("Enter start vertex (0-9): ");
                 scanf("%d", &start);
                 printf("Enter end vertex (0-9): ");
                 scanf("%d", &end);
-                if (start >= 0 && start < MAX_VERTICES && end >= 0 && end < MAX_VERTICES) {
+                if (start >= 0 && start < MAX_VERTICAL_NUM && end >= 0 && end < MAX_VERTICAL_NUM) {
                     insertEdge(graph, start, end);
                     printf("Edge (%d -> %d) inserted.\n", start, end);
                 } else {
-                    printf("Invalid vertex number.\n");
+                    printf("Invalid edge.\n");
                 }
                 break;
             case 'd':
                 printf("Enter start vertex for DFS (0-9): ");
                 scanf("%d", &start);
-                if (start >= 0 && start < MAX_VERTICES) {
+                if (start >= 0 && start < MAX_VERTICAL_NUM) {
                     clearVisited(graph);
                     printf("DFS starting from vertex %d: ", start);
                     depthFirstSearch(graph, start);
                     printf("\n");
-                } else {
+                } else
                     printf("Invalid vertex number.\n");
-                }
+                
                 break;
             case 'b':
                 printf("Enter start vertex for BFS (0-9): ");
                 scanf("%d", &start);
-                if (start >= 0 && start < MAX_VERTICES) {
+                if (start >= 0 && start < MAX_VERTICAL_NUM) {
                     clearVisited(graph);
                     printf("BFS starting from vertex %d: ", start);
                     breadthFirstSearch(graph, start);
                     printf("\n");
-                } else {
+                } else 
                     printf("Invalid vertex number.\n");
-                }
+                
                 break;
             case 'p':
                 printGraph(graph);
@@ -125,7 +112,7 @@ int main() {
 // 그래프 초기화
 Graph* initializeGraph() {
     Graph* graph = (Graph*)malloc(sizeof(Graph));
-    for (int i = 0; i < MAX_VERTICES; i++) {
+    for (int i = 0; i < MAX_VERTICAL_NUM; i++) {
         graph->adjList[i] = NULL;
         graph->visited[i] = false;
         graph->exists[i] = false; // 초기화 시 모든 정점은 존재하지 않음
@@ -133,16 +120,16 @@ Graph* initializeGraph() {
     return graph;
 }
 
-// 정점 삽입
+// vertex 삽입
 void insertVertex(Graph* graph, int vertex) {
     if (!graph->exists[vertex]) {
         graph->exists[vertex] = true;
     } else {
-        printf("Vertex %d already exists.\n", vertex);
+        printf("정점이 이미 존재합니다.\n", vertex);
     }
 }
 
-// 간선 삽입
+// edge 삽입
 void insertEdge(Graph* graph, int start, int end) {
     if (graph->exists[start] && graph->exists[end]) {
         Node* newNode = createNode(end);
@@ -156,22 +143,22 @@ void insertEdge(Graph* graph, int start, int end) {
             temp->next = newNode;
         }
     } else {
-        printf("One or both vertices do not exist.\n");
+        printf("정점 삽입 오류\n");
     }
 }
 
 
-// DFS 구현
+// DFS 
 void depthFirstSearch(Graph* graph, int vertex) {
     if (!graph->exists[vertex]) {
-        printf("Vertex %d does not exist.\n", vertex);
+        printf("정점이 존재하지 않습니다.\n", vertex);
         return;
     }
     Node* adjList = graph->adjList[vertex];
     Node* temp = adjList;
 
     graph->visited[vertex] = true;
-    printf("%d ", vertex);
+    printf("%d ", vertex); // 방문한 정점을 출력
 
     while (temp != NULL) {
         int connectedVertex = temp->vertex;
@@ -183,14 +170,14 @@ void depthFirstSearch(Graph* graph, int vertex) {
     }
 }
 
-// BFS 구현
+// BFS
 void breadthFirstSearch(Graph* graph, int startVertex) {
     if (!graph->exists[startVertex]) {
-        printf("Vertex %d does not exist.\n", startVertex);
+        printf("정점이 존재하지 않습니다.\n", startVertex);
         return;
     }
     clearVisited(graph);
-    enqueue(startVertex);
+    enqueue(startVertex); // 큐 자료구조를 활용하여 bfs 방식 구현
     graph->visited[startVertex] = true;
 
     while (!isEmpty()) {
@@ -213,7 +200,7 @@ void breadthFirstSearch(Graph* graph, int startVertex) {
 
 // 그래프 출력
 void printGraph(Graph* graph) {
-    for (int i = 0; i < MAX_VERTICES; i++) {
+    for (int i = 0; i < MAX_VERTICAL_NUM; i++) {
         if (graph->exists[i]) {
             Node* temp = graph->adjList[i];
             printf("\nVertex %d: ", i);
@@ -229,7 +216,7 @@ void printGraph(Graph* graph) {
 
 // 그래프 메모리 해제
 void freeGraph(Graph* graph) {
-    for (int i = 0; i < MAX_VERTICES; i++) {
+    for (int i = 0; i < MAX_VERTICAL_NUM; i++) {
         Node* temp = graph->adjList[i];
         while (temp) {
             Node* toFree = temp;
@@ -242,7 +229,7 @@ void freeGraph(Graph* graph) {
 
 // 방문 배열 초기화
 void clearVisited(Graph* graph) {
-    for (int i = 0; i < MAX_VERTICES; i++) {
+    for (int i = 0; i < MAX_VERTICAL_NUM; i++) {
         graph->visited[i] = false;
     }
 }
@@ -255,9 +242,9 @@ Node* createNode(int vertex) {
     return newNode;
 }
 
-// 큐에 삽입
+// enqueue
 void enqueue(int vertex) {
-    if (rear == MAX_VERTICES - 1) {
+    if (rear == MAX_VERTICAL_NUM - 1) {
         return;
     }
     if (front == -1) {
@@ -266,17 +253,17 @@ void enqueue(int vertex) {
     queue[++rear] = vertex;
 }
 
-// 큐에서 삭제
+// dequeue
 int dequeue() {
     if (isEmpty()) {
-        return -1;
+        return -1; // queue empty
     }
     int dequeued = queue[front];
-    if (front >= rear) {
+    if (front >= rear) 
         front = rear = -1;
-    } else {
+    else
         front++;
-    }
+    
     return dequeued;
 }
 
