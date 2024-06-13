@@ -41,7 +41,7 @@ bool isEmpty();
 int main() {
     printf("[----- [Goh Geon Young]  [2020017027] -----]\n");
 
-    Graph* graph = initGraph(); // 맨 처음에 graph 초기화
+    Graph* graph = NULL; // graph 선언
 
     // 필요 변수 선언
     char command;
@@ -57,12 +57,19 @@ int main() {
     printf("----------------------------------------------------------------\n");
 
     while (true) {
-        printf("\nEnter command: ");
+        printf("\n명령어 입력: ");
         scanf(" %c", &command);
         switch (command) {
             case 'z':
-                freeGraph(graph);
+                if (graph) // graph에 값이 있으면 메모리 해제
+                    freeGraph(graph);
                 graph = initGraph(); // graph 초기화
+                
+                if (graph == NULL) {
+                    printf(stderr, "그래프 초기화 실패\n");
+                    return -1; // 그래프 초기화 실패 시 -1 반환하여 프로그램 종료
+                }
+
                 printf("init graph.\n");
                 break;
             case 'v':
@@ -127,6 +134,10 @@ int main() {
 // 그래프 초기화
 Graph* initGraph() {
     Graph* graph = (Graph*)malloc(sizeof(Graph));
+    if (graph == NULL) { // 메모리 할당 실패 시 NULL 반환
+        printf(stderr, "메모리 할당 실패\n");
+        return NULL; 
+    }
     for (int i = 0; i < MAX_VERTICAL_NUM; i++) {
         // graph 초기화
         graph->adjList[i] = NULL;
@@ -153,10 +164,22 @@ void insertEdge(Graph* graph, int start, int end) {
             graph->adjList[start] = newNode; // 할당
         else {
             Node* temp = graph->adjList[start]; // start의 인접리스트
-
-            while (temp->next != NULL) // 해당 인접리스트의 마지막까지 이동
+            Node* prev = NULL; // prev
+            
+            // 정렬된 위치를 찾아 삽입
+            while (temp != NULL && temp->vertex < end) { // end보다 작을 때 까지 (정렬을 위하여)
+                prev = temp;
                 temp = temp->next;
-            temp->next = newNode; // 마지막의 뒤에 newNode를 붙인다.
+            }
+
+            if (prev == NULL) { // 삽입할 위치가 리스트의 맨 앞인 경우 -> 맨 앞으로 변경
+                newNode->next = graph->adjList[start];
+                graph->adjList[start] = newNode;
+            } else { // 삽입할 위치가 중간 또는 끝인 경우 -> 중간에 삽입
+                prev->next = newNode;
+                newNode->next = temp;
+            }
+
         }
     } else { // start, end의 정점이 존재하지 않으면
         printf("정점 삽입 오류\n");
@@ -218,7 +241,7 @@ void printGraph(Graph* graph) {
     for (int i = 0; i < MAX_VERTICAL_NUM; i++) {
         if (graph->exists[i]) { // Vertex 존재한다면
             Node* pTemp = graph->adjList[i];
-            printf("\nVertex %d: ", i);
+            printf("\n정점 %d: ", i);
             while (pTemp) {
                 printf("%d -> ", pTemp->vertex);
                 pTemp = pTemp->next;
@@ -252,6 +275,11 @@ void clearVisited(Graph* graph) {
 // 새로운 노드 생성
 Node* createNode(int vertex) {
     Node* newNode = (Node*)malloc(sizeof(Node)); // 새로운 노드 동적 할당
+    
+    if (newNode == NULL) {
+        printf("메모리 할당 실패\n");
+        return; // 메모리 할당 실패 시 NULL 반환
+    }
     newNode->vertex = vertex; // vertex 삽입
     newNode->next = NULL; // 다음 node NULL
     return newNode;
